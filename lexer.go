@@ -49,4 +49,17 @@ func (l *Lexer) SkipWhiteSpace() {}
 func (l *Lexer) SkipComment() {}
 
 // Return next token
-func (l *Lexer) GetToken() {}
+func (l *Lexer) GetToken() Token {
+	switch char := l.CurrentChar(); char {
+	case "+":
+		return Token{Text: char, Kind: PLUS}
+	case "-":
+		return Token{Text: char, Kind: MINUS}
+	case "=":
+		return Token{Text: char, Kind: EQ}
+	case "*":
+		return Token{Text: char, Kind: ASTERISK}
+	case "/":
+		return Token{Text: char, Kind: SLASH}
+	}
+}
