@@ -24,10 +24,15 @@ func (l *Lexer) CurrentChar() string {
 
 // Process the next character
 func (l *Lexer) NextChar() error {
-	l.Pos++
-	if l.Pos >= len(l.Source) {
+	// fmt.Println("Source len:")
+	// fmt.Println(len(l.Source))
+	// fmt.Println("Current pos:")
+	// fmt.Println(l.Pos)
+	// fmt.Println("------------------------")
+	if l.Pos+1 >= len(l.Source) {
 		return fmt.Errorf("EOF")
 	}
+	l.Pos++
 	return nil
 }
 
@@ -49,17 +54,26 @@ func (l *Lexer) SkipWhiteSpace() {}
 func (l *Lexer) SkipComment() {}
 
 // Return next token
-func (l *Lexer) GetToken() Token {
+func (l *Lexer) GetToken() (Token, error) {
+	var token Token
 	switch char := l.CurrentChar(); char {
 	case "+":
-		return Token{Text: char, Kind: PLUS}
+		token = Token{Text: char, Kind: PLUS}
 	case "-":
-		return Token{Text: char, Kind: MINUS}
+		token = Token{Text: char, Kind: MINUS}
 	case "=":
-		return Token{Text: char, Kind: EQ}
+		token = Token{Text: char, Kind: EQ}
 	case "*":
-		return Token{Text: char, Kind: ASTERISK}
+		token = Token{Text: char, Kind: ASTERISK}
 	case "/":
-		return Token{Text: char, Kind: SLASH}
+		token = Token{Text: char, Kind: SLASH}
+	default:
+		// return Token{}, fmt.Errorf("Unknown token: %s", char)
 	}
+
+	err := l.NextChar()
+	if err != nil {
+		return Token{Kind: EOF}, nil
+	}
+	return token, nil
 }

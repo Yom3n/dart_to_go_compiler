@@ -8,9 +8,17 @@ func main() {
 		return
 	}
 	lexer := MakeLexer(source)
-	var err error = nil
-	for ; err == nil; _, err = lexer.Peek() {
-		fmt.Println(lexer.CurrentChar())
-		lexer.NextChar()
+	token, err := lexer.GetToken()
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+		return
+	}
+	for token.Kind != EOF {
+		fmt.Println(token.Kind)
+		token, err = lexer.GetToken()
+		if err != nil {
+			fmt.Printf("Error getting token: %s", err.Error())
+			return
+		}
 	}
 }
