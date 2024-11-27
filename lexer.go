@@ -24,11 +24,6 @@ func (l *Lexer) CurrentChar() string {
 
 // Process the next character
 func (l *Lexer) NextChar() error {
-	// fmt.Println("Source len:")
-	// fmt.Println(len(l.Source))
-	// fmt.Println("Current pos:")
-	// fmt.Println(l.Pos)
-	// fmt.Println("------------------------")
 	if l.Pos+1 >= len(l.Source) {
 		return fmt.Errorf("EOF")
 	}
@@ -45,33 +40,86 @@ func (l *Lexer) Peek() (string, error) {
 }
 
 // Invalid token found
-func (l *Lexer) Abort() {}
+func (l *Lexer) Abort(message string) {
+	msg := "Lexing error. " + message
+	panic(msg)
+}
 
 // Skip whitespace except newlines, which we will use to indicate the end of a statement
-func (l *Lexer) SkipWhiteSpace() {}
+func (l *Lexer) SkipWhiteSpace() {
+	char := l.CurrentChar()
+	for char == " " || char == "\t" || char == "\r" {
+		fmt.Println("Skipping char: ")
+		fmt.Println(char)
+		err := l.NextChar()
+		if err != nil {
+			break
+		}
+	}
+}
 
 // Skip comments in code
 func (l *Lexer) SkipComment() {}
 
 // Return next token
 func (l *Lexer) GetToken() (Token, error) {
+	l.SkipWhiteSpace()
 	var token Token
+
+	next, err := l.Peek()
 	switch char := l.CurrentChar(); char {
 	case "+":
 		token = Token{Text: char, Kind: PLUS}
 	case "-":
 		token = Token{Text: char, Kind: MINUS}
 	case "=":
-		token = Token{Text: char, Kind: EQ}
+		if err != nil && next == "=" {
+			lastChar := l.CurrentChar()
+			l.NextChar()
+			token = Token{Text: lastChar + next, Kind: EQEQ}
+		} else {
+			token = Token{Text: char, Kind: EQ}
+		}
 	case "*":
 		token = Token{Text: char, Kind: ASTERISK}
 	case "/":
 		token = Token{Text: char, Kind: SLASH}
+	case "\n":
+		token = Token{Text: char, Kind: NEW_LINE}
+	case ">":
+		fmt.Println(next)
+		fmt.Println(err)
+		// TODO THIS nil compare fore some reason doesnt work
+		fmt.Println(err != nil)
+		if err != nil && next == "=" {
+			lastChar := l.CurrentChar()
+			l.NextChar()
+			fmt.Println("Correct token")
+			token = Token{Text: lastChar + next, Kind: GTEQ}
+		} else {
+			token = Token{Text: char, Kind: GT}
+		}
+	case "<":
+		if err != nil && next == "=" {
+			lastChar := l.CurrentChar()
+			l.NextChar()
+			token = Token{Text: lastChar + next, Kind: LTEQ}
+		} else {
+			token = Token{Text: char, Kind: LT}
+		}
+	case "!":
+		if err != nil && next == "=" {
+			lastChar := l.CurrentChar()
+			l.NextChar()
+			token = Token{Text: lastChar + next, Kind: NOTEQ}
+		} else {
+			l.Abort("Expected !=, got !")
+		}
 	default:
-		// return Token{}, fmt.Errorf("Unknown token: %s", char)
+		l.Abort("Unknown token: '" + char + "'")
 	}
 
-	err := l.NextChar()
+	err = l.NextChar()
 	if err != nil {
 		return Token{Kind: EOF}, nil
 	}
