@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	source := ">="
+	source := "- */ >>= = !="
 	if len(source) == 0 {
 		return
 	}

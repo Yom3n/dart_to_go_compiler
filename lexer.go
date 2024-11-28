@@ -87,20 +87,15 @@ func (l *Lexer) GetToken() (Token, error) {
 	case "\n":
 		token = Token{Text: char, Kind: NEW_LINE}
 	case ">":
-		fmt.Println(next)
-		fmt.Println(err)
-		// TODO THIS nil compare fore some reason doesnt work
-		fmt.Println(err != nil)
-		if err != nil && next == "=" {
+		if err == nil && next == "=" {
 			lastChar := l.CurrentChar()
 			l.NextChar()
-			fmt.Println("Correct token")
 			token = Token{Text: lastChar + next, Kind: GTEQ}
 		} else {
 			token = Token{Text: char, Kind: GT}
 		}
 	case "<":
-		if err != nil && next == "=" {
+		if err == nil && next == "=" {
 			lastChar := l.CurrentChar()
 			l.NextChar()
 			token = Token{Text: lastChar + next, Kind: LTEQ}
@@ -108,7 +103,7 @@ func (l *Lexer) GetToken() (Token, error) {
 			token = Token{Text: char, Kind: LT}
 		}
 	case "!":
-		if err != nil && next == "=" {
+		if err == nil && next == "=" {
 			lastChar := l.CurrentChar()
 			l.NextChar()
 			token = Token{Text: lastChar + next, Kind: NOTEQ}
