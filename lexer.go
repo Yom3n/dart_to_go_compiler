@@ -49,9 +49,10 @@ func (l *Lexer) Abort(message string) {
 func (l *Lexer) SkipWhiteSpace() {
 	char := l.CurrentChar()
 	for char == " " || char == "\t" || char == "\r" {
-		fmt.Println("Skipping char: ")
-		fmt.Println(char)
+		// fmt.Println("Skipping char: ")
+		// fmt.Println(char)
 		err := l.NextChar()
+		char = l.CurrentChar()
 		if err != nil {
 			break
 		}
